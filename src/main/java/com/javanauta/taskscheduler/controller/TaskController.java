@@ -22,16 +22,16 @@ public class TaskController {
 
     @PostMapping
     public ResponseEntity<TaskDTO> createTask(@RequestBody TaskDTO taskDTO,
-                                                @RequestHeader("Authorization") String token) {
+                                              @RequestHeader("Authorization") String token) {
         return ResponseEntity.ok(taskService.saveTask(token, taskDTO));
     }
 
     @GetMapping("/events")
     public ResponseEntity<List<TaskDTO>> findListTaskByPeriod(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)LocalDateTime dateCreated,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)LocalDateTime dateUpdated,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateCreated,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateUpdated,
             @RequestParam NotificationStatusEnum statusEnum
-    ){
+    ) {
 
         return ResponseEntity.ok(taskService.findTaskSchedulerByPeriod(
                 dateCreated, dateUpdated, statusEnum
@@ -40,10 +40,30 @@ public class TaskController {
 
     @GetMapping
     public ResponseEntity<List<TaskDTO>> findListByEmail(
-            @RequestHeader("Authorization") String token){
+            @RequestHeader("Authorization") String token) {
         List<TaskDTO> tasks = taskService.findTasksByEmail(token);
 
         return ResponseEntity.ok(tasks);
+    }
+
+    @DeleteMapping
+    public ResponseEntity<Void> deleteTask(@RequestParam("id") String id) {
+        taskService.deleteTaskById(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping
+    public ResponseEntity<TaskDTO> updateStatusNotification(
+            @RequestParam("status") NotificationStatusEnum statusEnum,
+            @RequestParam("id") String id){
+
+        return ResponseEntity.ok(taskService.updateStatus(statusEnum, id));
+    }
+
+    @PutMapping
+    public ResponseEntity<TaskDTO> updateTask(@RequestBody TaskDTO dto,
+                                              @RequestParam("id") String id){
+        return ResponseEntity.ok(taskService.updateTask(dto, id));
     }
 
 }
